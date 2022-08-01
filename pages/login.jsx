@@ -1,20 +1,7 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import { app } from "../firebase.config";
-import { useEffect } from "react";
-import { useRouter } from "next/router";
-export default function Home() {
-  const router = useRouter();
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (!user) {
-        router.push("/login");
-      }
-      return unsubscribe;
-    });
-  }, []);
-
+const Login = () => {
   return (
     <div className={styles.container}>
       <Head>
@@ -24,8 +11,10 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1>Home</h1>
+        <h1>Login</h1>
       </main>
     </div>
   );
-}
+};
+
+export default Login;
