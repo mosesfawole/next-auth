@@ -1,6 +1,6 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-
+import { app } from "../firebase.config";
 const Login = () => {
   return (
     <div className={styles.container}>

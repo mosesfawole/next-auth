@@ -1,16 +1,15 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import { app } from "../firebase.config";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { auth } from "../firebase.config";
+
 export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (!user) {
-        router.push("/login");
-      }
+      user ? router.push("/") : router.push("/login");
       return unsubscribe;
     });
   }, []);
@@ -25,6 +24,13 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1>Home</h1>
+        <form className={styles.form}>
+          <input type="text" placeholder="Name" className={styles.inputBox} />
+          <input type="text" placeholder="Age" className={styles.inputBox} />
+          <button className={styles.button} type="submit">
+            ADD
+          </button>
+        </form>
       </main>
     </div>
   );
