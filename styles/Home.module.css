@@ -60,6 +60,11 @@
   color: red;
   margin-bottom: 10px;
 }
+.message {
+  color: green;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
 .button {
   width: fit-content;
   padding: 10px 12px;

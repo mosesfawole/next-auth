@@ -9,6 +9,7 @@ import { useAuth } from "../context/AuthContext";
 export default function Home() {
   const router = useRouter();
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   const { currentUser, logout } = useAuth();
 
@@ -25,8 +26,13 @@ export default function Home() {
     if (!currentUser) {
       router.push("/login");
     }
+    setMessage(`Welcome ${currentUser.email}`);
   }, []);
-
+  if (message) {
+    setTimeout(() => {
+      setMessage("");
+    }, 5000);
+  }
   return (
     <div className={styles.container}>
       <Head>
@@ -37,6 +43,9 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1>Home</h1>
+        <p className={styles.error}>{error}</p>
+        <p className={styles.message}>{message}</p>
+
         <form className={styles.form}>
           <input type="text" placeholder="Name" className={styles.inputBox} />
           <input type="text" placeholder="Age" className={styles.inputBox} />
