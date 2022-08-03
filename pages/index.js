@@ -3,16 +3,12 @@ import styles from "../styles/Home.module.css";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { auth } from "../firebase.config";
+import { reauthenticateWithPopup } from "firebase/auth";
 
 export default function Home() {
   const router = useRouter();
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      user ? router.push("/") : router.push("/login");
-      return unsubscribe;
-    });
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <div className={styles.container}>
