@@ -4,13 +4,24 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/router";
 import Loader from "./Loader";
+import {
+  GithubAuthProvider,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
+import { auth } from "../firebase.config";
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const router = useRouter();
+
+  const googleProvider = new GoogleAuthProvider();
+  const githubProvider = new GithubAuthProvider();
+
   const { signup, currentUser } = useAuth();
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,6 +45,27 @@ const Register = () => {
       if (currentUser.email === email) {
         return setError("Email already exists");
       }
+      setError(error.message);
+    }
+  };
+
+  const handleGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      alert("Registration successful");
+      router.push("/");
+    } catch (error) {
+      setLoading(false);
+      setError(error.message);
+    }
+  };
+  const handleGithub = async () => {
+    try {
+      await signInWithPopup(auth, githubProvider);
+      alert("Registration successful");
+      router.push("/");
+    } catch (error) {
+      setLoading(false);
       setError(error.message);
     }
   };
@@ -77,14 +109,14 @@ const Register = () => {
           <button type="submit" className={styles.button}>
             Sign Up
           </button>
-          <button onClick={() => {}} className={styles.button}>
-            Sign Up with Google{" "}
-            <i className="fa fa-google" aria-hidden="true"></i>{" "}
-          </button>
-          <button onClick={() => {}} className={styles.button}>
-            Sign Up Github
-          </button>
         </form>
+        <button onClick={handleGoogle} className={styles.button}>
+          Sign Up with Google{" "}
+          <i className="fa fa-google" aria-hidden="true"></i>{" "}
+        </button>
+        <button onClick={handleGithub} className={styles.button}>
+          Sign Up Github
+        </button>
       </main>
     </div>
   );

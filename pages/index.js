@@ -1,14 +1,31 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { auth } from "../firebase.config";
 import { reauthenticateWithPopup } from "firebase/auth";
+import { useAuth } from "../context/AuthContext";
 
 export default function Home() {
   const router = useRouter();
+  const [error, setError] = useState("");
 
-  useEffect(() => {}, []);
+  const { currentUser, logout } = useAuth();
+
+  const handleLogout = async () => {
+    setError("");
+    try {
+      await logout();
+      return router.push("/login");
+    } catch (error) {
+      setError("Logout Failed");
+    }
+  };
+  useEffect(() => {
+    if (!currentUser) {
+      router.push("/login");
+    }
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -25,6 +42,13 @@ export default function Home() {
           <input type="text" placeholder="Age" className={styles.inputBox} />
           <button className={styles.button} type="submit">
             ADD
+          </button>
+          <button
+            onClick={handleLogout}
+            className={styles.button}
+            type="submit"
+          >
+            LOG OUT
           </button>
         </form>
       </main>

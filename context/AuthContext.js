@@ -8,8 +8,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-const googleProvider = new GoogleAuthProvider();
-const githubProvider = new GithubAuthProvider();
+
 const AuthContext = createContext();
 
 export const useAuth = () => {
