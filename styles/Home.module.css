@@ -65,6 +65,11 @@
   font-weight: 500;
   margin-bottom: 10px;
 }
+.list {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .button {
   width: fit-content;
   padding: 10px 12px;

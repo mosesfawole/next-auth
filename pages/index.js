@@ -3,8 +3,13 @@ import styles from "../styles/Home.module.css";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { auth, database } from "../firebase.config";
-import { collection, addDoc, getDocs } from "firebase/firestore";
-import { reauthenticateWithPopup } from "firebase/auth";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import Loader from "./Loader";
 const databaseRef = collection(database, "CRUD data");
@@ -14,8 +19,10 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
+  const [id, setId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [isUpdate, setIsUpdate] = useState(false);
   const { currentUser, logout } = useAuth();
 
   const handleLogout = async () => {
@@ -67,6 +74,34 @@ export default function Home() {
       );
     });
   };
+
+  const getID = (id, name, age) => {
+    setName(name);
+    setAge(age);
+    setId(id);
+    setIsUpdate(true);
+  };
+
+  const updateData = (e) => {
+    e.preventDefault();
+
+    if (name === "" || age === "") {
+      return setError("Please fill all fields");
+    }
+    const bookDoc = doc(database, "CRUD data", id);
+    updateDoc(bookDoc, {
+      name: name,
+      age: Number(age),
+    })
+      .then(() => {
+        setMessage("Data updated successfully");
+        setName("");
+        setAge(null);
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  };
   useEffect(() => {
     if (!currentUser) {
       router.push("/login");
@@ -110,9 +145,19 @@ export default function Home() {
             value={age}
             onChange={(e) => setAge(e.target.value)}
           />
-          <button onClick={addData} className={styles.button} type="submit">
-            ADD
-          </button>
+          {isUpdate ? (
+            <button
+              onClick={updateData}
+              className={styles.button}
+              type="submit"
+            >
+              Update
+            </button>
+          ) : (
+            <button onClick={addData} className={styles.button} type="submit">
+              ADD
+            </button>
+          )}
           <button onClick={handleLogout} className={styles.button}>
             LOG OUT
           </button>
@@ -120,9 +165,16 @@ export default function Home() {
         <div className="">
           {data.map((item) => {
             return (
-              <div key={item.id} className="">
-                <h3>{item.name}</h3>
-                <p>{item.age}</p>
+              <div key={item.id} className={styles.list}>
+                <h3>Name: {item.name}</h3>
+                <p>Age: {item.age}</p>
+                <button
+                  onClick={() => getID(item.id, item.name, item.age)}
+                  className={styles.button}
+                >
+                  {" "}
+                  Update
+                </button>
               </div>
             );
           })}
