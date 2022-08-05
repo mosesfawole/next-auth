@@ -9,6 +9,7 @@ import {
   getDocs,
   doc,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import Loader from "./Loader";
@@ -53,11 +54,12 @@ export default function Home() {
       age,
     })
       .then(() => {
+        getData();
         setError("");
-        setLoading(false);
         setMessage("Data added successfully");
         setName("");
         setAge(null);
+        setLoading(false);
       })
       .catch((error) => {
         setError(error.message);
@@ -66,13 +68,18 @@ export default function Home() {
   };
 
   const getData = async () => {
-    await getDocs(databaseRef).then((response) => {
-      setData(
-        response.docs.map((items) => {
-          return { ...items.data(), id: items.id };
-        })
-      );
-    });
+    await getDocs(databaseRef)
+      .then((response) => {
+        setData(
+          response.docs.map((items) => {
+            return { ...items.data(), id: items.id };
+          })
+        );
+      })
+      .catch((error) => {
+        setError(error.message);
+        setError("Failed to fetch data");
+      });
   };
 
   const getID = (id, name, age) => {
@@ -82,14 +89,14 @@ export default function Home() {
     setIsUpdate(true);
   };
 
-  const updateData = (e) => {
+  const updateData = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     if (name === "" || age === "") {
       return setError("Please fill all fields");
     }
     const bookDoc = doc(database, "CRUD data", id);
-    updateDoc(bookDoc, {
+    await updateDoc(bookDoc, {
       name: name,
       age: Number(age),
     })
@@ -97,16 +104,32 @@ export default function Home() {
         setMessage("Data updated successfully");
         setName("");
         setAge(null);
+        setLoading(false);
       })
       .catch((error) => {
         setError(error.message);
       });
   };
+
+  const deleteData = async (id) => {
+    setLoading(true);
+    const bookDoc = doc(database, "CRUD data", id);
+    await deleteDoc(bookDoc)
+      .then(() => {
+        getData();
+        setMessage("Data deleted");
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError("Failed to delete data");
+        setError(error.message);
+      });
+  };
   useEffect(() => {
+    getData();
     if (!currentUser) {
       router.push("/login");
     }
-    getData();
     setError("");
   }, []);
   if (message) {
@@ -174,6 +197,13 @@ export default function Home() {
                 >
                   {" "}
                   Update
+                </button>
+                <button
+                  onClick={() => deleteData(item.id)}
+                  className={styles.button}
+                >
+                  {" "}
+                  Delete
                 </button>
               </div>
             );
