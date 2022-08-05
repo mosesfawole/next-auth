@@ -2,15 +2,20 @@ import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { auth } from "../firebase.config";
+import { auth, database } from "../firebase.config";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 import { reauthenticateWithPopup } from "firebase/auth";
 import { useAuth } from "../context/AuthContext";
-
+import Loader from "./Loader";
+const databaseRef = collection(database, "CRUD data");
 export default function Home() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
   const { currentUser, logout } = useAuth();
 
   const handleLogout = async () => {
@@ -22,16 +27,60 @@ export default function Home() {
       setError("Logout Failed");
     }
   };
+
+  const addData = (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    setMessage("");
+    if (name === "" || age === "") {
+      setLoading(false);
+      return setError("Please fill all fields");
+    }
+    if (name.length < 3) {
+      setLoading(false);
+      return setError("Name must be at least 3 characters long");
+    }
+    addDoc(databaseRef, {
+      name,
+      age,
+    })
+      .then(() => {
+        setError("");
+        setLoading(false);
+        setMessage("Data added successfully");
+        setName("");
+        setAge(null);
+      })
+      .catch((error) => {
+        setError(error.message);
+        console.log(error);
+      });
+  };
+
+  const getData = async () => {
+    await getDocs(databaseRef).then((response) => {
+      setData(
+        response.docs.map((items) => {
+          return { ...items.data(), id: items.id };
+        })
+      );
+    });
+  };
   useEffect(() => {
     if (!currentUser) {
       router.push("/login");
     }
-    setMessage(`Welcome ${currentUser.email}`);
+    getData();
+    setError("");
   }, []);
   if (message) {
     setTimeout(() => {
       setMessage("");
-    }, 5000);
+    }, 3000);
+  }
+  if (loading) {
+    return <Loader />;
   }
   return (
     <div className={styles.container}>
@@ -43,23 +92,41 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1>Home</h1>
-        <p className={styles.error}>{error}</p>
-        <p className={styles.message}>{message}</p>
 
         <form className={styles.form}>
-          <input type="text" placeholder="Name" className={styles.inputBox} />
-          <input type="text" placeholder="Age" className={styles.inputBox} />
-          <button className={styles.button} type="submit">
+          <p className={styles.error}>{error}</p>
+          <p className={styles.message}>{message}</p>
+          <input
+            type="text"
+            placeholder="Name"
+            className={styles.inputBox}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder="Age"
+            className={styles.inputBox}
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+          />
+          <button onClick={addData} className={styles.button} type="submit">
             ADD
           </button>
-          <button
-            onClick={handleLogout}
-            className={styles.button}
-            type="submit"
-          >
+          <button onClick={handleLogout} className={styles.button}>
             LOG OUT
           </button>
         </form>
+        <div className="">
+          {data.map((item) => {
+            return (
+              <div key={item.id} className="">
+                <h3>{item.name}</h3>
+                <p>{item.age}</p>
+              </div>
+            );
+          })}
+        </div>
       </main>
     </div>
   );
