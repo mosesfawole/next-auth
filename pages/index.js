@@ -92,6 +92,9 @@ export default function Home() {
   const updateData = async (e) => {
     e.preventDefault();
     setLoading(true);
+    // if (name === Number) {
+    //   return setError("Please enter a string");
+    // }
     if (name === "" || age === "") {
       return setError("Please fill all fields");
     }
@@ -149,7 +152,7 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1>Home</h1>
+        <h1>Dashboard</h1>
 
         <form className={styles.form}>
           <p className={styles.error}>{error}</p>
@@ -200,7 +203,7 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => deleteData(item.id)}
-                  className={styles.button}
+                  className={styles.delete}
                 >
                   {" "}
                   Delete

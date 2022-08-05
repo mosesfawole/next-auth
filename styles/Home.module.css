@@ -70,15 +70,21 @@
   align-items: center;
   gap: 10px;
 }
-.button {
+.button,
+.delete {
   width: fit-content;
   padding: 10px 12px;
+  display: flex;
   cursor: pointer;
   border: 1px solid #ccc;
   border-radius: 8px;
   margin-bottom: 10px;
 
   transition: all 0.3s ease-in-out;
+}
+.delete:hover {
+  background-color: red;
+  color: white;
 }
 .button:hover {
   background-color: black;
