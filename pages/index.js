@@ -2,7 +2,7 @@ import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { auth, database } from "../firebase.config";
+import { database } from "../firebase.config";
 import {
   collection,
   addDoc,

@@ -1,6 +1,5 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import { app } from "../firebase.config";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import Router from "next/router";
